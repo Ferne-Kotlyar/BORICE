@@ -761,6 +761,9 @@ class Family(object):
 					mg = find_mom_genotype(allele_set, self.offspring, i, null_loci, self.name)
 					assert mg
 				self.mom.genotype_list[i] = mg
+
+	def __lt__(self, other):
+		return str(self) < str(other)
 				
 	def __str__(self):
 		"""Returns a string identifying a family and its maternal individual.
@@ -809,17 +812,17 @@ class Population(object):
 		"""
 		null = null_loci[locus_index]
 		if null:
- 			for n, allele in enumerate(locus_alleles):
- 				self.y_values[locus_index].append(allele.y)
- 			
- 			new_af_list = []
- 			for n, allele in enumerate(locus_alleles):
- 				new_af = allele.y / sum(self.y_values[locus_index])
- 				new_af_list.append(new_af)
- 				if step > burn_in:
- 					if (step % 10) == 0:
- 						allele.af_list.append(new_af)
- 		else:
+			for n, allele in enumerate(locus_alleles):
+				self.y_values[locus_index].append(allele.y)
+			
+			new_af_list = []
+			for n, allele in enumerate(locus_alleles):
+				new_af = allele.y / sum(self.y_values[locus_index])
+				new_af_list.append(new_af)
+				if step > burn_in:
+					if (step % 10) == 0:
+						allele.af_list.append(new_af)
+		else:
 			for n, allele in enumerate(locus_alleles):
 				if n == 0:
 					continue
@@ -894,7 +897,7 @@ def parse_csv(stream, sep):
 	line_iterator = iter(reader)
 	
 	# first line should be number of markers, indicator of presence of population name, indicator of presence of a subgroup name
-	first_row = line_iterator.next()
+	first_row = line_iterator.__next__()
 	if len(first_row) < 3:
 		raise CSVFileParseException(stream, 1, "Expecting at least three columns in the first row")
 
@@ -921,7 +924,7 @@ def parse_csv(stream, sep):
 	else:
 		raise CSVFileParseException(stream, 1, 'Expecting a 0 or 1 in the third column of the first row (Found "%s") to indicate subgroup names absent or present' % subgroup_indicator)
 
-	second_row = line_iterator.next()
+	second_row = line_iterator.__next__()
 	if len(second_row) < num_markers:
 		raise CSVFileParseException(stream, 2, "Expecting at least %s columns of marker names in the second row")
 	# the lists within marker_names each contain two index positions, index 0 = marker name, index 1 = empty
@@ -1034,10 +1037,10 @@ class BORICE(object):
 			# initial allele frequencies are set
 			if null:
 				alleles = len(sorted_alleles)
- 				freq = 1.0 / alleles
- 				assert freq
- 				af = [] # the initial allele frequency list; allele zero is the null allele
- 			else:
+				freq = 1.0 / alleles
+				assert freq
+				af = [] # the initial allele frequency list; allele zero is the null allele
+			else:
 				alleles = len(unique_alleles)
 				freq = 1.0 / alleles
 				assert freq
@@ -1093,14 +1096,14 @@ class BORICE(object):
 				fam.possible_genotypes.append([])
 
 		#creates four output files
-		borice_output1 = open('BORICE_output1.txt', 'wb')
+		borice_output1 = open('BORICE_output1.txt', 'w')
 		if(writeOutput2):
-			borice_output2 = open('BORICE_output2.txt', 'wb')
+			borice_output2 = open('BORICE_output2.txt', 'w')
 		if(writeOutput3):
-			borice_output3 = open('BORICE_output3.txt', 'wb')
+			borice_output3 = open('BORICE_output3.txt', 'w')
 			borice_output3.write("List of t, F, and ln likelihoood values from every 10 steps in the chain beyond the burn-in\nt\tF\tLn Likelihood of the Data\n")
 		if(writeOutput4):
-			borice_output4 = open('BORICE_output4.txt', 'wb')
+			borice_output4 = open('BORICE_output4.txt', 'w')
 	
 		# below lists needed for storage of t, ih, and F before output to text files
 		t_list = []
@@ -1116,11 +1119,11 @@ class BORICE(object):
 			burn_in = 999
 		if num_steps is None:		
 			num_steps = 100000
-                #print num_steps
+				#print num_steps
 		for step in range(num_steps):
 			if step != 0:
 				self.current_step = step - 1
-                        #print self.current_step
+						#print self.current_step
 			
 			prev_t = population.outcrossing_rate
 			prev_lnL = population.calc_pop_lnL(locus_model)
@@ -1194,8 +1197,8 @@ class BORICE(object):
 				#print(new_f)
 				lnL = fam.mom.calc_prob_mom_geno(fam.population_name)
 				#print(lnL)
- 				if (lnL == float('-inf')):
- 					fam.inbreeding_history = prev_ih
+				if (lnL == float('-inf')):
+					fam.inbreeding_history = prev_ih
 					prev_f = fam.mom.calc_inbreeding_coefficient(fam.inbreeding_history)
 					f_list.append(prev_f)
 					#print("1")
@@ -1219,7 +1222,7 @@ class BORICE(object):
 							prev_f = fam.mom.calc_inbreeding_coefficient(fam.inbreeding_history)
 							f_list.append(prev_f)
 							#print("1")
- 		
+		
 				if step > burn_in:
 					if (step % 10) == 0:
 						ih_list.append(fam.inbreeding_history)
@@ -1234,8 +1237,8 @@ class BORICE(object):
 						borice_output3.write("%.2f" % pop_inbreeding_coefficient + "\t")
 
 			del population.ih_prob_list[:]
- 			
- 			if (step % 10) == 0:
+			
+			if (step % 10) == 0:
 				# changes allele frequencies
 				for locus_index, locus in enumerate(all_alleles):
 					allele_freq = population.allele_freq_list[locus_index]
@@ -1487,24 +1490,24 @@ class BORICE(object):
 			for n, allele in enumerate(locus_alleles):
 				null = locus_model[locus_index]
 				if null:
- 					borice_output1.write("Allele %s\n" % allele.name)
- 					af_list = allele.af_list
- 					while bin < 1.01:
- 						af_bin_list = []
- 						for i, af in enumerate(af_list):
- 							if (af >= bin) and (af < (bin + 0.01)):
- 								af_bin_list.append(af)
- 							else:
- 								continue
- 						af_count = len(af_bin_list)
- 						af_percent = float(af_count)/len(af_list)
- 						borice_output1.write("bin =\t%.2f\taf proportion =\t%.4f\n" % (bin, af_percent))
- 						bin = bin + 0.01
- 					bin = 0.0
- 				else:
- 					if n == 0: # skips allele zero, which is a dummy allele that remains at a frequency of zero
- 						continue
- 					else:
+					borice_output1.write("Allele %s\n" % allele.name)
+					af_list = allele.af_list
+					while bin < 1.01:
+						af_bin_list = []
+						for i, af in enumerate(af_list):
+							if (af >= bin) and (af < (bin + 0.01)):
+								af_bin_list.append(af)
+							else:
+								continue
+						af_count = len(af_bin_list)
+						af_percent = float(af_count)/len(af_list)
+						borice_output1.write("bin =\t%.2f\taf proportion =\t%.4f\n" % (bin, af_percent))
+						bin = bin + 0.01
+					bin = 0.0
+				else:
+					if n == 0: # skips allele zero, which is a dummy allele that remains at a frequency of zero
+						continue
+					else:
 						borice_output1.write("Allele %s\n" % allele.name)
 						af_list = allele.af_list
 						while bin < 1.01:

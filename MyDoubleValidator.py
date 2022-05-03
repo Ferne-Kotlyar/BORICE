@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # Modules
 #
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 
 class MyDoubleValidator(QtGui.QDoubleValidator):
 	"""

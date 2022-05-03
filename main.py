@@ -16,15 +16,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 """
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 import sys
 import BORICE_GUI
 
 def main():
-	app = QtGui.QApplication(sys.argv)
+	app = QtWidgets.QApplication(sys.argv)
 	window = BORICE_GUI.MainWindow(None, app)
 	window.show()
 	sys.exit(app.exec_())
 
 if __name__ == '__main__': 
 	main()
+
+
