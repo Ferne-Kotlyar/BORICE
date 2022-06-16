@@ -68,6 +68,8 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.writeOutput3 = True
 		self.writeOutput4 = True
 
+		self.ignoreGenotypingErrors = False
+
 		#build the user interface
 		self.setupUI()
 
@@ -148,6 +150,11 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.AlleleFreqTuningParamText.setMaximumWidth(maxLineWidth)
 		self.AlleleFreqTuningParamText.setAlignment(QtCore.Qt.AlignRight)
 		self.AlleleFreqTuningParamText.setValidator(zeroOneValidator)
+		#Ignore Genotyping Errors
+		self.IgnoreGenotypingErrorsCheckbox = QtWidgets.QCheckBox()
+		self.IgnoreGenotypingErrorsCheckbox.setChecked(self.ignoreGenotypingErrors)
+		self.IgnoreGenotypingErrorsCheckbox.setMaximumWidth(maxLineWidth)
+		self.IgnoreGenotypingErrorsCheckbox.toggled.connect(self.setIgnoreGenotypingErrors)
 
 		#Run Button
 		runBox = QtWidgets.QWidget()
@@ -199,6 +206,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		genSettingsLayout.addRow("Outcrossing Rate Tuning Parameter: ", self.outcrossingRateTuningParamText)
 		genSettingsLayout.addRow("Allele Frequency Tuning Parameter: ", self.AlleleFreqTuningParamText)
 		genSettingsLayout.addRow("Initial Population Outcrossing Rate: ", self.initialPopulationOutcrossingRateText)
+		genSettingsLayout.addRow("Ignore Genotyping Errors: ", self.IgnoreGenotypingErrorsCheckbox)
 		self.tabWidget.addTab(genSettingsBox, "General Settings")
 		
 		outputOptionsBox = QtWidgets.QWidget()
@@ -279,6 +287,9 @@ class MainWindow(QtWidgets.QMainWindow):
 	def setAlleleFreqTuningParam(self, tuningParam):
 		if tuningParam:
 			self.alleleFreqTuningParam = tuningParam
+
+	def setIgnoreGenotypingErrors(self, value):
+		self.ignoreGenotypingErrors = value
 	
 	def setInitialPopulationOutcrossingRate(self, outcrossingRate):
 		if outcrossingRate:
@@ -357,7 +368,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.progress.show()
 		self.runButton.hide()
 
-		thread = BoriceThread(self, self.dataFileName, self.locusModel, self.numSteps, self.numBurnInSteps, self.outcrossingRateTuningParam, self.alleleFreqTuningParam, self.outcrossingRate, self.writeOutput2, self.writeOutput3, self.writeOutput4)
+		thread = BoriceThread(self, self.dataFileName, self.locusModel, self.numSteps, self.numBurnInSteps, self.outcrossingRateTuningParam, self.alleleFreqTuningParam, self.outcrossingRate, self.writeOutput2, self.writeOutput3, self.writeOutput4, self.ignoreGenotypingErrors)
 
 		thread.start()
 		canceled = False
@@ -382,7 +393,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		return
 		
 class BoriceThread(QtCore.QThread):
-	def __init__(self, parent, dataFileName, locusModel, numSteps, numBurnInSteps, outcrossingRateTuningParam, alleleFreqTuningParam, outcrossingRate, writeOutput2, writeOutput3, writeOutput4):
+	def __init__(self, parent, dataFileName, locusModel, numSteps, numBurnInSteps, outcrossingRateTuningParam, alleleFreqTuningParam, outcrossingRate, writeOutput2, writeOutput3, writeOutput4, ignoreGenotypingErrors):
 		super(BoriceThread, self).__init__(parent)
 		self.dataFileName = dataFileName
 		self.locusModel = locusModel
@@ -395,11 +406,12 @@ class BoriceThread(QtCore.QThread):
 		self.writeOutput2 = writeOutput2
 		self.writeOutput3 = writeOutput3
 		self.writeOutput4 = writeOutput4
+		self.ignoreGenotypingErrors = ignoreGenotypingErrors
 		#print self.writeOutput2, self.writeOutput3, self.writeOutput4
 		self.Borice = BORICE.BORICE()
 
 	def run(self):
-		self.Borice.main(self.dataFileName, self.locusModel, self.numSteps, self.numBurnInSteps, self.outcrossingRateTuningParam, self.alleleFreqTuningParam, self.outcrossingRate, self.writeOutput2, self.writeOutput3, self.writeOutput4)
+		self.Borice.main(self.dataFileName, self.locusModel, self.numSteps, self.numBurnInSteps, self.outcrossingRateTuningParam, self.alleleFreqTuningParam, self.outcrossingRate, self.writeOutput2, self.writeOutput3, self.writeOutput4, self.ignoreGenotypingErrors)
 
 	def getStep(self):
 		return self.Borice.getStep()

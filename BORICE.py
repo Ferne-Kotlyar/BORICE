@@ -26,6 +26,7 @@ import csv
 import time
 from decimal import *
 
+_ignore_genotyping_errors = False
 _seed_borice_rand = os.environ.get('BORICE_RAND_SEED')
 if _seed_borice_rand:
 	_seed_borice_rand = long(_seed_borice_rand) # the long function returns an integer of unlimited precision
@@ -534,13 +535,14 @@ def tag_mom_genotype(momfirst, momsecond, offspring, locus_index, null_loci, fam
 #  	slg.imputed = True
 #  	return slg
 	
-	
+	global _ignore_genotyping_errors
+
 	m_list = [momfirst, momsecond]
 	works = True
 	for child in offspring:
 		cg = child.genotype_list[locus_index]
 		# skips missing genotypes
-		if (cg.first == -9) and (cg.second == -9):
+		if _ignore_genotyping_errors or ((cg.first == -9) and (cg.second == -9)):
 			continue
 		# checks that the observed genotype is possible based on the progeny genotype
 		if (cg.first not in m_list) and (cg.second not in m_list):
@@ -566,7 +568,7 @@ def tag_mom_genotype(momfirst, momsecond, offspring, locus_index, null_loci, fam
 				for child in offspring:
 					cg = child.genotype_list[locus_index]
 					# skips missing genotypes
-					if (cg.first == -9) and (cg.second == -9):
+					if _ignore_genotyping_errors or ((cg.first == -9) and (cg.second == -9)):
 						continue
 					# checks that imputed null genotype is possible based on progeny genotype
 					if (cg.first == cg.second):
@@ -591,7 +593,7 @@ def tag_mom_genotype(momfirst, momsecond, offspring, locus_index, null_loci, fam
 					for child in offspring:
 						cg = child.genotype_list[locus_index]
 						# skips missing genotypes
-						if (cg.first == -9) and (cg.second == -9):
+						if _ignore_genotyping_errors or ((cg.first == -9) and (cg.second == -9)):
 							continue
 						# checks that null heterozygote genotype is possible based on progeny genotype
 						if (cg.first == cg.second):
@@ -1008,7 +1010,9 @@ class BORICE(object):
 	def getStep(self):
 		return self.current_step
 
-	def main(self, file_name, locus_model, num_steps = None, burn_in = None, outcrossing_rate_tuning_parameter = 0.05, allele_freq_tuning_parameter = 0.1, initial_outcrossing_rate = 0.5, writeOutput2 = True, writeOutput3 = True, writeOutput4 = True):
+	def main(self, file_name, locus_model, num_steps = None, burn_in = None, outcrossing_rate_tuning_parameter = 0.05, allele_freq_tuning_parameter = 0.1, initial_outcrossing_rate = 0.5, writeOutput2 = True, writeOutput3 = True, writeOutput4 = True, ignore_genotyping_errors = False):
+		global _ignore_genotyping_errors
+		_ignore_genotyping_errors = ignore_genotyping_errors
 		input = open(file_name, 'rU')
 		#print writeOutput2, writeOutput3, writeOutput4
 		try:
