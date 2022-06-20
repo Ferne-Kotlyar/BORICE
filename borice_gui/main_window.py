@@ -1,28 +1,14 @@
-#!/usr/bin/env python2
-"""
-BORICE is software for the estimation of population mean outcrossing rates and
-inbreeding coefficients using Bayesian methods.
-Copyright (C) 2012 Vanessa A. Koelling, Patrick J. Monnahan, John K. Kelly
-
-This program is free software: you can redistribute it and/or modify it under 
-the terms of the GNU General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>
-"""
-from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 import os
-from MyDoubleValidator import MyDoubleValidator
-import BORICE
 
-class MainWindow(QtWidgets.QMainWindow):
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+from borice.csv_utils import *
+from borice_gui.borice_thread import *
+
+class MainWindow(QMainWindow):
 	"""
 	This class defines the graphical user interface for the BORICE program,
 	allowing for easy user input and data display.
@@ -37,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		#set window size to default and set the icon and window title
 		self.resize(700,550)
 		self.setWindowTitle("BORICE")
-		self.setWindowIcon(QtGui.QIcon(os.path.join('Images','dna.png')))
+		self.setWindowIcon(QIcon(os.path.join('Images','dna.png')))
 
 		#
 		# Input/Output Data
@@ -78,25 +64,25 @@ class MainWindow(QtWidgets.QMainWindow):
 		Creates the layout and all widgets for the MainWindow.
 		"""
 		#Central Widget
-		centralWidget = QtWidgets.QWidget(self)
+		centralWidget = QWidget(self)
 		self.setCentralWidget(centralWidget)
 
 		#Central Layout
-		centralLayout = QtWidgets.QVBoxLayout()
+		centralLayout = QVBoxLayout()
 		centralLayout.setAlignment(QtCore.Qt.AlignCenter)
 		centralWidget.setLayout(centralLayout)
 
 		#Actions for the Menu Bar
 		#Open Data File
-		fileOpenAction = QtWidgets.QAction("&Open Data File", self)
-		fileOpenAction.setShortcut(QtGui.QKeySequence.Open)
+		fileOpenAction = QAction("&Open Data File", self)
+		fileOpenAction.setShortcut(QKeySequence.Open)
 		helpText = "Open a data file"
 		fileOpenAction.setToolTip(helpText)
 		fileOpenAction.setStatusTip(helpText)
 		fileOpenAction.triggered.connect(self.fileOpen)
 		#Quit
-		fileQuitAction = QtWidgets.QAction("&Quit", self)
-		fileQuitAction.setShortcut(QtGui.QKeySequence.Quit)
+		fileQuitAction = QAction("&Quit", self)
+		fileQuitAction.setShortcut(QKeySequence.Quit)
 		helpText = "Exit"
 		fileQuitAction.setToolTip(helpText)
 		fileQuitAction.setStatusTip(helpText)
@@ -111,71 +97,68 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.fileMenu.addAction(fileQuitAction)
 		#self.helpMenu.addAction()
 		
-		#Validator for entries to be from 0-1
-		zeroOneValidator = MyDoubleValidator(0,1,2,self)
-		
-		#Validator for only positive integers(for numbers of steps)
 		maxStep = 999999999
-		posValidator = QtGui.QIntValidator(0, maxStep, self)
+		posValidator = QIntValidator(0, maxStep, self)
+		zeroOneValidator = QDoubleValidator(0, 1, 2, self)
 		
 		#Max Widths
 		maxLineWidth = 250
 		
-		self.numStepsText = QtWidgets.QLineEdit("100000")
+		self.numStepsText = QLineEdit("100000")
 		self.numStepsText.textChanged.connect(self.setNumSteps)
 		self.numStepsText.setMaximumWidth(maxLineWidth)
 		self.numStepsText.setAlignment(QtCore.Qt.AlignRight)
 		self.numStepsText.setValidator(posValidator)
 		#Number of steps to Burn In input
-		self.numStepsBurnInText = QtWidgets.QLineEdit("9999")
+		self.numStepsBurnInText = QLineEdit("9999")
 		self.numStepsBurnInText.textChanged.connect(self.setBurnInSteps)
 		self.numStepsBurnInText.setMaximumWidth(maxLineWidth)
 		self.numStepsBurnInText.setAlignment(QtCore.Qt.AlignRight)
 		self.numStepsBurnInText.setValidator(posValidator)
 		#Outcrossing Rate Tuning Parameter
-		self.outcrossingRateTuningParamText = QtWidgets.QLineEdit("0.05")
+		self.outcrossingRateTuningParamText = QLineEdit("0.05")
 		self.outcrossingRateTuningParamText.textChanged.connect(self.setOutcrossingRateTuningParam)
 		self.outcrossingRateTuningParamText.setMaximumWidth(maxLineWidth)
 		self.outcrossingRateTuningParamText.setAlignment(QtCore.Qt.AlignRight)
 		self.outcrossingRateTuningParamText.setValidator(zeroOneValidator)
 		#Initial Population Outcrossing Rate
-		self.initialPopulationOutcrossingRateText = QtWidgets.QLineEdit("0.5")
+		self.initialPopulationOutcrossingRateText = QLineEdit("0.5")
 		self.initialPopulationOutcrossingRateText.textChanged.connect(self.setInitialPopulationOutcrossingRate)
 		self.initialPopulationOutcrossingRateText.setValidator(zeroOneValidator)
 		self.initialPopulationOutcrossingRateText.setMaximumWidth(maxLineWidth)
 		self.initialPopulationOutcrossingRateText.setAlignment(QtCore.Qt.AlignRight)
 		#Allele Frequency Tuning Parameter
-		self.AlleleFreqTuningParamText = QtWidgets.QLineEdit("0.1")
+		self.AlleleFreqTuningParamText = QLineEdit("0.1")
 		self.AlleleFreqTuningParamText.textChanged.connect(self.setAlleleFreqTuningParam)
 		self.AlleleFreqTuningParamText.setMaximumWidth(maxLineWidth)
 		self.AlleleFreqTuningParamText.setAlignment(QtCore.Qt.AlignRight)
 		self.AlleleFreqTuningParamText.setValidator(zeroOneValidator)
 		#Ignore Genotyping Errors
-		self.IgnoreGenotypingErrorsCheckbox = QtWidgets.QCheckBox()
+		self.IgnoreGenotypingErrorsCheckbox = QCheckBox()
 		self.IgnoreGenotypingErrorsCheckbox.setChecked(self.ignoreGenotypingErrors)
 		self.IgnoreGenotypingErrorsCheckbox.setMaximumWidth(maxLineWidth)
 		self.IgnoreGenotypingErrorsCheckbox.toggled.connect(self.setIgnoreGenotypingErrors)
 
 		#Run Button
-		runBox = QtWidgets.QWidget()
-		self.runLayout = QtWidgets.QVBoxLayout()
+		runBox = QWidget()
+		self.runLayout = QVBoxLayout()
 		self.runLayout.setAlignment(QtCore.Qt.AlignCenter)
 		runBox.setLayout(self.runLayout)
-		self.runButton = QtWidgets.QPushButton("Run")
+		self.runButton = QPushButton("Run")
 		self.runLayout.addWidget(self.runButton)
 		
 		#Posterior Distributions of Maternal Inbreeding Histories
-		self.outputOptionTwoCheckBox = QtWidgets.QCheckBox()
+		self.outputOptionTwoCheckBox = QCheckBox()
 		self.outputOptionTwoCheckBox.setChecked(True)
 		self.outputOptionTwoCheckBox.toggled.connect(self.setWrite2)
 		
 		#List of t and F values
-		self.outputOptionThreeCheckBox = QtWidgets.QCheckBox()
+		self.outputOptionThreeCheckBox = QCheckBox()
 		self.outputOptionThreeCheckBox.setChecked(True)
 		self.outputOptionThreeCheckBox.toggled.connect(self.setWrite3)
 		
 		#Posterior Distributions for each maternal genotype at each locus in each family
-		self.outputOptionFourCheckBox = QtWidgets.QCheckBox()
+		self.outputOptionFourCheckBox = QCheckBox()
 		self.outputOptionFourCheckBox.setChecked(True)
 		self.outputOptionFourCheckBox.toggled.connect(self.setWrite4)
 		
@@ -183,20 +166,20 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.runButton.clicked.connect(self.progress)
 		
 		#Add input widgets to the layout
-		settingsBox = QtWidgets.QGroupBox("Settings")
+		settingsBox = QGroupBox("Settings")
 		centralLayout.addWidget(settingsBox)
-		settingsLayout = QtWidgets.QVBoxLayout()
+		settingsLayout = QVBoxLayout()
 		settingsBox.setLayout(settingsLayout)
 		centralLayout.addWidget(runBox)
 		
-		self.tabWidget = QtWidgets.QTabWidget(settingsBox)
+		self.tabWidget = QTabWidget(settingsBox)
 		settingsLayout.addWidget(self.tabWidget)
 		
 		#General settings box (Number of settings known a priori)
-		genSettingsBox = QtWidgets.QWidget()
-		genSettingsLayout = QtWidgets.QFormLayout(genSettingsBox)
-		genSettingsLayout.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
-		genSettingsLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
+		genSettingsBox = QWidget()
+		genSettingsLayout = QFormLayout(genSettingsBox)
+		genSettingsLayout.setSizeConstraint(QLayout.SetMinimumSize)
+		genSettingsLayout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
 		genSettingsLayout.setContentsMargins(0, 0, 0, 0)
 		genSettingsLayout.setFormAlignment(QtCore.Qt.AlignCenter)
 		genSettingsLayout.setLabelAlignment(QtCore.Qt.AlignLeft)
@@ -209,8 +192,8 @@ class MainWindow(QtWidgets.QMainWindow):
 		genSettingsLayout.addRow("Ignore Genotyping Errors: ", self.IgnoreGenotypingErrorsCheckbox)
 		self.tabWidget.addTab(genSettingsBox, "General Settings")
 		
-		outputOptionsBox = QtWidgets.QWidget()
-		outputOptionsLayout = QtWidgets.QFormLayout(outputOptionsBox)
+		outputOptionsBox = QWidget()
+		outputOptionsLayout = QFormLayout(outputOptionsBox)
 		outputOptionsLayout.setContentsMargins(0, 0, 0, 0)
 		outputOptionsLayout.setFormAlignment(QtCore.Qt.AlignCenter)
 		outputOptionsLayout.setLabelAlignment(QtCore.Qt.AlignLeft)
@@ -220,22 +203,22 @@ class MainWindow(QtWidgets.QMainWindow):
 		outputOptionsLayout.addRow("Posterior Distributions for each maternal genotype at each locus in each family: ", self.outputOptionFourCheckBox)
 		self.tabWidget.addTab(outputOptionsBox, "File Output Options")
 		
-		infoBox = QtWidgets.QWidget()
-		infoLayout = QtWidgets.QFormLayout()
+		infoBox = QWidget()
+		infoLayout = QFormLayout()
 		infoLayout.setContentsMargins(0, 0, 0, 0)
 		infoLayout.setFormAlignment(QtCore.Qt.AlignCenter)
 		infoLayout.setLabelAlignment(QtCore.Qt.AlignLeft)
 		infoBox.setLayout(infoLayout)
 		
-		self.numLociLabel = QtWidgets.QLabel("")
-		self.numLociLabel.setSizePolicy(QtWidgets.QSizePolicy.Maximum,
-										QtWidgets.QSizePolicy.Maximum)
-		self.numFamiliesLabel = QtWidgets.QLabel("")
-		self.numFamiliesLabel.setSizePolicy(QtWidgets.QSizePolicy.Maximum,
-										QtWidgets.QSizePolicy.Maximum)
-		self.numIndividualsLabel = QtWidgets.QLabel("")
-		self.numIndividualsLabel.setSizePolicy(QtWidgets.QSizePolicy.Maximum,
-										QtWidgets.QSizePolicy.Maximum)
+		self.numLociLabel = QLabel("")
+		self.numLociLabel.setSizePolicy(QSizePolicy.Maximum,
+										QSizePolicy.Maximum)
+		self.numFamiliesLabel = QLabel("")
+		self.numFamiliesLabel.setSizePolicy(QSizePolicy.Maximum,
+										QSizePolicy.Maximum)
+		self.numIndividualsLabel = QLabel("")
+		self.numIndividualsLabel.setSizePolicy(QSizePolicy.Maximum,
+										QSizePolicy.Maximum)
 
 		infoLayout.addRow("Number of Marker Loci: ", self.numLociLabel)
 		infoLayout.addRow("Number of Families: ", self.numFamiliesLabel)
@@ -252,9 +235,9 @@ class MainWindow(QtWidgets.QMainWindow):
 		#Locus CheckBox
 		locusCheckBoxList = []
 		for n, locus in enumerate(self.locusModel):
-			locusCheckBox = QtWidgets.QCheckBox(str(n), self)
+			locusCheckBox = QCheckBox(str(n), self)
 			palette = locusCheckBox.palette()
-			palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor(0,0,0,0))
+			palette.setColor(QPalette.WindowText, QColor(0,0,0,0))
 			locusCheckBox.setPalette(palette)
 			locusCheckBox.setChecked(False)
 			locusCheckBox.toggled.connect(self.setLocus)
@@ -262,8 +245,8 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.locusCheckBoxList = locusCheckBoxList
 
 		#Locus settings box (Number of settings determined by input data file)
-		locusSettingsBox = QtWidgets.QWidget()
-		locusSettingsLayout = QtWidgets.QFormLayout(locusSettingsBox)
+		locusSettingsBox = QWidget()
+		locusSettingsLayout = QFormLayout(locusSettingsBox)
 		locusSettingsLayout.setContentsMargins(0, 0, 0, 0)
 		locusSettingsLayout.setFormAlignment(QtCore.Qt.AlignCenter)
 		locusSettingsLayout.setLabelAlignment(QtCore.Qt.AlignLeft)
@@ -310,13 +293,13 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.writeOutput4 = writeOutput4
 	
 	def fileOpen(self):
-		self.dataFileName, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open Data File", ".", "Data Files (*.csv)")
+		self.dataFileName, _ = QFileDialog.getOpenFileName(self, "Open Data File", ".", "Data Files (*.csv)")
 		#Populate data entry tables for Allele Frequency Selection and Inbreeding History Selection
 		if(self.dataFileName):
 			dataFile = open(self.dataFileName, "rU")
 			try:
-				marker_names, families = BORICE.parse_csv(dataFile, ',')	
-			except BORICE.CSVFileParseException as x:
+				marker_names, families = parse_csv(dataFile, ',')	
+			except CSVFileParseException as x:
 				sys.exit(str(x))
 
 			dataFile = open(self.dataFileName, "rU")
@@ -347,21 +330,21 @@ class MainWindow(QtWidgets.QMainWindow):
 	def progress(self):
 		#Progress Dialog
 		if not self.numSteps:
-			message = QtWidgets.QMessageBox(self)
+			message = QMessageBox(self)
 			message.setWindowTitle("Error")
 			message.setText("Please enter a value for the number of steps!")
 			message.exec_()
 			return
 
 		if not self.numBurnInSteps:
-			message = QtWidgets.QMessageBox(self)
+			message = QMessageBox(self)
 			message.setWindowTitle("Error")
 			message.setText("Please enter a value for the number of burn in steps!")
 			message.exec_()
 			return
 
 		numSteps = self.numSteps
-		self.progress = QtWidgets.QProgressDialog("Calculating...", "Stop", 0, numSteps, self)
+		self.progress = QProgressDialog("Calculating...", "Stop", 0, numSteps, self)
 		self.progress.setWindowModality(QtCore.Qt.WindowModal)
 		self.progress.resize(300,125)
 		self.progress.setWindowTitle("Calculating...")
@@ -374,8 +357,8 @@ class MainWindow(QtWidgets.QMainWindow):
 		canceled = False
 
 		while thread.getStep() != self.numSteps - 1:
-			self.progress.setValue(100 * thread.getStep()/self.numSteps)
-			QtWidgets.QApplication.instance().processEvents()			
+			self.progress.setValue(int(100 * thread.getStep()/self.numSteps))
+			QApplication.instance().processEvents()			
 			if(self.progress.wasCanceled()):
 				thread.quit()
 				canceled = True				
@@ -386,36 +369,9 @@ class MainWindow(QtWidgets.QMainWindow):
 		if canceled:
 			return
 
-		message = QtWidgets.QMessageBox(self)
+		message = QMessageBox(self)
 		message.setWindowTitle("Complete!")
 		message.setText("Done! Please look in your current working directory for output files.")
 		message.exec_()
 		return
-		
-class BoriceThread(QtCore.QThread):
-	def __init__(self, parent, dataFileName, locusModel, numSteps, numBurnInSteps, outcrossingRateTuningParam, alleleFreqTuningParam, outcrossingRate, writeOutput2, writeOutput3, writeOutput4, ignoreGenotypingErrors):
-		super(BoriceThread, self).__init__(parent)
-		self.dataFileName = dataFileName
-		self.locusModel = locusModel
-		print(self.locusModel)
-		self.numSteps = numSteps
-		self.numBurnInSteps = numBurnInSteps
-		self.outcrossingRateTuningParam = outcrossingRateTuningParam
-		self.alleleFreqTuningParam = alleleFreqTuningParam
-		self.outcrossingRate = outcrossingRate
-		self.writeOutput2 = writeOutput2
-		self.writeOutput3 = writeOutput3
-		self.writeOutput4 = writeOutput4
-		self.ignoreGenotypingErrors = ignoreGenotypingErrors
-		#print self.writeOutput2, self.writeOutput3, self.writeOutput4
-		self.Borice = BORICE.BORICE()
-
-	def run(self):
-		self.Borice.main(self.dataFileName, self.locusModel, self.numSteps, self.numBurnInSteps, self.outcrossingRateTuningParam, self.alleleFreqTuningParam, self.outcrossingRate, self.writeOutput2, self.writeOutput3, self.writeOutput4, self.ignoreGenotypingErrors)
-
-	def getStep(self):
-		return self.Borice.getStep()
-        
-		
-		
-		
+	
