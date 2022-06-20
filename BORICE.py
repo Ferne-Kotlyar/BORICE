@@ -1180,8 +1180,8 @@ class BORICE(object):
 				prev_f = fam.mom.calc_inbreeding_coefficient(fam.inbreeding_history)
 				#print(prev_f)
 				prev_mom_lnL = fam.mom.calc_prob_mom_geno(fam.population_name)
- 				#print(prev_mom_lnL)
- 				
+				#print(prev_mom_lnL)
+				
 				rand_num = random.random()
 				cumulative_prob = 0
 				ih_value = 0
@@ -1194,7 +1194,7 @@ class BORICE(object):
 						i = 1
 					else:
 						ih_value = ih_value + 1
- 		
+		
 				fam.inbreeding_history = new_ih
 				#print(fam.inbreeding_history)
 				new_f = fam.mom.calc_inbreeding_coefficient(fam.inbreeding_history)
@@ -1231,7 +1231,7 @@ class BORICE(object):
 					if (step % 10) == 0:
 						ih_list.append(fam.inbreeding_history)
 						fam.inbreeding_history_list.append(fam.inbreeding_history)
- 			
+			
 			pop_inbreeding_coefficient = sum(f_list)/len(f_list)
 
 			if step > burn_in:
@@ -1368,9 +1368,9 @@ class BORICE(object):
 						fam.possible_genotypes[n].append(str(genotype))
 		
 				if step > burn_in:
- 					if (step % 10) == 0:
- 						for n, genotype in enumerate(fam.mom.genotype_list):
- 							fam.locus_genotypes[n].append(str(fam.mom.genotype_list[n]))
+					if (step % 10) == 0:
+						for n, genotype in enumerate(fam.mom.genotype_list):
+							fam.locus_genotypes[n].append(str(fam.mom.genotype_list[n]))
 
 			if step > burn_in:
 				if (step % 10) == 0:
@@ -1573,6 +1573,8 @@ if __name__ == '__main__':
 		writeOutput4 = bool(int(sys.argv[12]))
 	except:
 		pass
+	ignoreGenotypingErrors = bool(int(sys.argv[13]))
+
 	sys.stderr.write(repr(dataFileName) + '\n	 ')
 	sys.stderr.write(repr(locus_model) + '\n	 ')
 	sys.stderr.write(repr(numSteps) + '\n	 ')
@@ -1583,5 +1585,6 @@ if __name__ == '__main__':
 	sys.stderr.write(repr(writeOutput2) + '\n	 ')
 	sys.stderr.write(repr(writeOutput3) + '\n	 ')
 	sys.stderr.write(repr(writeOutput4) + '\n	 ')
+	sys.stderr.write(repr(ignoreGenotypingErrors) + '\n	 ')
 		
-	Borice.main(dataFileName, locus_model, numSteps, numBurnInSteps, outcrossingRateTuningParam, alleleFreqTuningParam, outcrossingRate, writeOutput2, writeOutput3, writeOutput4)
+	Borice.main(dataFileName, locus_model, numSteps, numBurnInSteps, outcrossingRateTuningParam, alleleFreqTuningParam, outcrossingRate, writeOutput2, writeOutput3, writeOutput4, ignoreGenotypingErrors)
