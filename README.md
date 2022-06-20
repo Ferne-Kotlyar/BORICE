@@ -1,5 +1,5 @@
-# GUIDE TO INSTALLATION & USE OF BORICE: BAYESIAN OUTCROSSING RATE AND INBREEDING COEFFICIENT ESTIMATION SOFTWARE
-BORICE is free software developed by Vanessa Koelling, Patrick Monnahan, and John Kelly to estimate the mean outcrossing rate and inbreeding coefficient of populations using Bayesian methods. To learn more about how this software works, its uses, and for the purposes of citing this software, please refer to the following publication:
+# GUIDE TO INSTALLATION & USE OF BORICE
+BORICE is free software developed by Vanessa Koelling, Patrick Monnahan, and John Kelly (modified by Ferne Kotylar and Adrien Givry) to estimate the mean outcrossing rate and inbreeding coefficient of populations using Bayesian methods. To learn more about how this software works, its uses, and for the purposes of citing this software, please refer to the following publication:
 
 	Koelling, V. A., P. J. Monnahan, and J. K. Kelly. 2012. A Bayesian method for the joint
 	estimation of outcrossing rate and inbreeding depression. Heredity 109: 393-400. 
@@ -9,49 +9,84 @@ This version introduces several changes:
 - Updated to work with Python 3 and PyQt5
 - Updated documentation
 - Added a toggle to ignore genotype errors
+- Improved project structure
 
-## How To Format Your Data Files for Use with BORICE
-BORICE takes genotype data in the form of comma-separated value (csv) files. In your csv file, missing data should be coded as '-9'. The first row of the csv file should contain the following in the first three cells: 1) the number of marker loci, 2) a 0 or 1 to indicate the absence or presence of a population name in your data, and 3) a 0 or 1 to indicate the absence or presence of a subgroup name in your data. Currently, subgroups are not supported, so if subgroups are present they will be ignored. The second row should contain the names of your marker loci. All other rows should be in the following format: cell 1 = family name; cell 2 = population name (unless there isn't one); cell 3 = allele 1 of marker locus 1; cell 4 = allele 2 of marker locus 1; and so forth for all loci. If maternal individuals are present, they should be indicated with a '!' after the family name (e.g., 'fam1!').
-
-### Example Data File
-	3,1,0,,,,,
-	aat374,aat240,aat367,,,,,
-	10,SS,152,152,98,98,-9,-9
-	10,SS,149,149,98,98,185,191
-	10,SS,149,149,98,98,191,191
-	10,SS,149,149,98,98,185,191
-	100,SS,149,152,98,98,185,185
-	100,SS,149,149,98,98,185,185
-	100,SS,149,152,98,98,185,185
-	100,SS,149,152,98,98,188,188
-	12,SS,149,149,98,98,185,191
-	12,SS,149,152,98,98,185,191
-	12,SS,149,152,98,98,185,191
-	12,SS,152,152,-9,-9,-9,-9
-	14,SS,149,149,98,98,185,185
-
-## Dependencies
-### Python
-BORICE was initially developed using Python 2.7. It has updated to work with Python 3 (tested with 3.9.12), but should work with other versions of Python 3 as well.
+## Requirements
+BORICE was initially developed using Python 2.7. It has been updated to work with Python 3 (tested with 3.9.12), but should work with other versions of Python 3 as well.
 
 Go to the following website to download Python: 
 
 	http://www.python.org/download/
 
-BORICE functions through a graphical user interface (GUI). In order for the GUI to function, you will need to install some additional third party software.
+The installation guide bellow assumes that you are familiar with:
+- [pip](https://pypi.org/project/pip/) (package installer for python)
+- [CLI](https://en.wikipedia.org/wiki/Command-line_interface) (command-line interface, such as *terminal* on MacOS/Linux, and *Command Prompt* on Windows)
 
-### PyQt5
-You will need to install PyQt5, it can be found at the following website:
+## Installation
+Install the requirements by typing:
+```
+pip install -r requirements.txt
+```
 
-	https://pypi.org/project/PyQt5/
+You can then install the local package by typing:
+```
+pip install -e .
+```
 
-## How To Run 
-To run BORICE GUI, open main.py from your BORICE folder. To do this from the terminal, execute this command: 
+## Running
+After the installation is complete, you can run BORICE using one of these commands:
+- GUI (Graphical User Interface version):
+```
+python borice_gui
+```
 
-	python main.py
+- CLI (Command-line version):
+```
+python borice
+	[data file name]
+	[locus 1]
+	[locus 2]
+	[locus 3]
+	[number of steps]
+	[number of burn in steps]
+	[outcrossing rate tuning parameter]
+	[allele frequency tuning parameter]
+	[outcrossing rate tuning parameter]
+	[write output 2]
+	[write output 3]
+	[write output 4]
+	[ignore genotyping errors]
+```
 
-The “.py” denotes that this is a Python file. A Python window will then open labeled “BORICE”. The Command Prompt window will also be launched. Any errors that occur during the run will appear in the Command Prompt window.
+## Unit Tests
+To run the unit tests (using the `example_datafile.csv`), you can run this command:
+```
+py.test
+```
 
+## How To Format Your Data Files for Use with BORICE
+BORICE takes genotype data in the form of comma-separated value (csv) files. In your csv file, missing data should be coded as '-9'. The first row of the csv file should contain the following in the first three cells: 1) the number of marker loci, 2) a 0 or 1 to indicate the absence or presence of a population name in your data, and 3) a 0 or 1 to indicate the absence or presence of a subgroup name in your data. Currently, subgroups are not supported, so if subgroups are present they will be ignored. The second row should contain the names of your marker loci. All other rows should be in the following format: cell 1 = family name; cell 2 = population name (unless there isn't one); cell 3 = allele 1 of marker locus 1; cell 4 = allele 2 of marker locus 1; and so forth for all loci. If maternal individuals are present, they should be indicated with a '!' after the family name (e.g., 'fam1!').
+
+### Example Data File
+```
+3,1,0,,,,,
+aat374,aat240,aat367,,,,,
+10,SS,152,152,98,98,-9,-9
+10,SS,149,149,98,98,185,191
+10,SS,149,149,98,98,191,191
+10,SS,149,149,98,98,185,191
+100,SS,149,152,98,98,185,185
+100,SS,149,149,98,98,185,185
+100,SS,149,152,98,98,185,185
+100,SS,149,152,98,98,188,188
+12,SS,149,149,98,98,185,191
+12,SS,149,152,98,98,185,191
+12,SS,149,152,98,98,185,191
+12,SS,152,152,-9,-9,-9,-9
+14,SS,149,149,98,98,185,185
+```
+
+## Usage
 Once BORICE GUI is open, click on the file menu and select “Open Data File”. Then select your input data file. You will then have the option to run BORICE with default settings or to change the settings. Below are the default settings listed under the “General Settings” tab.
 
 ### Default Settings
