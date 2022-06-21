@@ -12,24 +12,70 @@ from .family import *
 from .individual import *
 from .genotype import *
 
-_seed_borice_rand = os.environ.get('BORICE_RAND_SEED')
-if _seed_borice_rand:
-	_seed_borice_rand = int(_seed_borice_rand) # the long function returns an integer of unlimited precision
-	random.seed(_seed_borice_rand)
-
-class Application(object):
-	"""An object that encompasses the main functional components of the BORICE software.
+class Application(object):	
+	"""The application class encompasses the main functional components of the BORICE software.
 	"""
+	# Default Settings
+	LOCUS_MODEL = [0, 0, 0]
+	NUM_STEPS = 100000
+	BURN_IN = 9999
+	OUTCROSSING_RATE_TUNING = 0.05
+	ALLELE_FREQUENCY_TUNING = 0.1
+	INITIAL_OUTCROSSING_RATE = 0.5
+	WRITE_OUTPUT_2 = True
+	WRITE_OUTPUT_3 = True
+	WRITE_OUTPUT_4 = True
+	IGNORE_GENOTYPING_ERRORS = False
+	SEED = None
+
 	def __init__(self):
 		#Progress of calculation
-		self.current_step = 0		
+		self.current_step = 0	
 
 	def getStep(self):
 		return self.current_step
 
-	def run(self, file_name, locus_model, num_steps = None, burn_in = None, outcrossing_rate_tuning_parameter = 0.05, allele_freq_tuning_parameter = 0.1, initial_outcrossing_rate = 0.5, writeOutput2 = True, writeOutput3 = True, writeOutput4 = True, ignore_genotyping_errors = False):
+	def run(self,
+			file_name,
+			locus_model = LOCUS_MODEL,
+			num_steps = NUM_STEPS,
+			burn_in = BURN_IN,
+			outcrossing_rate_tuning_parameter = OUTCROSSING_RATE_TUNING,
+			allele_freq_tuning_parameter = ALLELE_FREQUENCY_TUNING,
+			initial_outcrossing_rate = INITIAL_OUTCROSSING_RATE,
+			writeOutput2 = WRITE_OUTPUT_2,
+			writeOutput3 = WRITE_OUTPUT_3,
+			writeOutput4 = WRITE_OUTPUT_4,
+			ignore_genotyping_errors = IGNORE_GENOTYPING_ERRORS,
+			seed = SEED):
+
+		print('')
+		print("Running BORICE with the following settings:")
+		print('- Data file: ' + file_name)
+		print('- Locus Model: ' + str(locus_model))
+		print('- Number of Steps: ' + str(num_steps))
+		print('- Burn-in Steps: ' + str(burn_in))
+		print('- Outcrossing Tuning Parameter: ' + str(outcrossing_rate_tuning_parameter))
+		print('- Allele Frequency Tuning Parameter: ' + str(allele_freq_tuning_parameter))
+		print('- Initial Outcrossing Rate: ' + str(initial_outcrossing_rate))
+		print('- Ignore Genotyping Errors: ' + str(ignore_genotyping_errors))
+		print('- Write Output 2: ' + str(writeOutput2))
+		print('- Write Output 3: ' + str(writeOutput3))
+		print('- Write Output 4: ' + str(writeOutput4))
+		print('- Seed: ' + str(seed))
+		print('')
+
+		# If a custom seed has been provided, initialize the random number generator with this seed.
+		if seed:
+			random.seed(seed)
+		else:
+			environmentSeed = os.environ.get('BORICE_RAND_SEED')
+			# If no custom seed has been provided and an environment seed exists, initialize the random number generator with this seed.
+			if environmentSeed:
+				random.seed(int(environmentSeed))
+
 		input = open(file_name, 'r')
-		#print writeOutput2, writeOutput3, writeOutput4
+
 		try:
 			marker_names, families = parse_csv(input, ',')	
 		except CSVFileParseException as x:
@@ -130,15 +176,10 @@ class Application(object):
 		F_list = []
 		pop_lnL_list = []
 		
-		start_time = time.asctime()
-		print("start time was %s" % start_time)
+		print("start time was %s" % time.asctime())
+		start_time = time.time()
 		
 		# below is the code to perform Bayesian inference of outcrossing rate (t), inbreeding history, allele frequencies, maternal genotypes
-		if burn_in is None:		
-			burn_in = 999
-		if num_steps is None:		
-			num_steps = 100000
-				#print num_steps
 		for step in range(num_steps):
 			if step != 0:
 				self.current_step = step - 1
@@ -393,9 +434,10 @@ class Application(object):
 					if(writeOutput3):
 						borice_output3.write("%.6f" % population.calc_pop_lnL(locus_model) + "\n")
 
-		endtime = time.asctime()
-		print("end time was %s" % endtime)
-		
+		end_time = time.time()
+		print("end time was %s" % time.asctime())
+		print("executed in %ss" % str(round(end_time - start_time, 2)))
+
 		# main code dealing with file output begins here
 		borice_output1.write("Posterior distribution of population inbreeding history:\n")
 
