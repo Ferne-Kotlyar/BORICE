@@ -29,11 +29,11 @@ class MainWindow(QMainWindow):
 		# Input/Output Data
 		#
 		#Outcrossing Rate. Can range from 0-1
-		self.outcrossingRate = 0.50
+		self.outcrossingRate = Application.INITIAL_OUTCROSSING_RATE
 		#Number of steps
-		self.numSteps = 100000
+		self.numSteps = Application.NUM_STEPS
 		#Number of steps to burn in
-		self.numBurnInSteps = 9999
+		self.numBurnInSteps = Application.BURN_IN
 		#Number of steps taken
 		self.numStepsTaken = None
 		#Number of marker loci
@@ -47,14 +47,14 @@ class MainWindow(QMainWindow):
 
 		self.dataFileName = ""
 
-		self.outcrossingRateTuningParam = 0.05
-		self.alleleFreqTuningParam = 0.1
+		self.outcrossingRateTuningParam = Application.OUTCROSSING_RATE_TUNING
+		self.alleleFreqTuningParam = Application.ALLELE_FREQUENCY_TUNING
 		
-		self.writeOutput2 = True
-		self.writeOutput3 = True
-		self.writeOutput4 = True
+		self.writeOutput2 = Application.WRITE_OUTPUT_2
+		self.writeOutput3 = Application.WRITE_OUTPUT_3
+		self.writeOutput4 = Application.WRITE_OUTPUT_4
 
-		self.ignoreGenotypingErrors = False
+		self.ignoreGenotypingErrors = Application.IGNORE_GENOTYPING_ERRORS
 
 		#build the user interface
 		self.setupUI()
@@ -104,31 +104,31 @@ class MainWindow(QMainWindow):
 		#Max Widths
 		maxLineWidth = 250
 		
-		self.numStepsText = QLineEdit("100000")
+		self.numStepsText = QLineEdit(str(self.numSteps))
 		self.numStepsText.textChanged.connect(self.setNumSteps)
 		self.numStepsText.setMaximumWidth(maxLineWidth)
 		self.numStepsText.setAlignment(QtCore.Qt.AlignRight)
 		self.numStepsText.setValidator(posValidator)
 		#Number of steps to Burn In input
-		self.numStepsBurnInText = QLineEdit("9999")
+		self.numStepsBurnInText = QLineEdit(str(self.numBurnInSteps))
 		self.numStepsBurnInText.textChanged.connect(self.setBurnInSteps)
 		self.numStepsBurnInText.setMaximumWidth(maxLineWidth)
 		self.numStepsBurnInText.setAlignment(QtCore.Qt.AlignRight)
 		self.numStepsBurnInText.setValidator(posValidator)
 		#Outcrossing Rate Tuning Parameter
-		self.outcrossingRateTuningParamText = QLineEdit("0.05")
+		self.outcrossingRateTuningParamText = QLineEdit(str(self.outcrossingRateTuningParam))
 		self.outcrossingRateTuningParamText.textChanged.connect(self.setOutcrossingRateTuningParam)
 		self.outcrossingRateTuningParamText.setMaximumWidth(maxLineWidth)
 		self.outcrossingRateTuningParamText.setAlignment(QtCore.Qt.AlignRight)
 		self.outcrossingRateTuningParamText.setValidator(zeroOneValidator)
 		#Initial Population Outcrossing Rate
-		self.initialPopulationOutcrossingRateText = QLineEdit("0.5")
+		self.initialPopulationOutcrossingRateText = QLineEdit(str(self.outcrossingRate))
 		self.initialPopulationOutcrossingRateText.textChanged.connect(self.setInitialPopulationOutcrossingRate)
 		self.initialPopulationOutcrossingRateText.setValidator(zeroOneValidator)
 		self.initialPopulationOutcrossingRateText.setMaximumWidth(maxLineWidth)
 		self.initialPopulationOutcrossingRateText.setAlignment(QtCore.Qt.AlignRight)
 		#Allele Frequency Tuning Parameter
-		self.AlleleFreqTuningParamText = QLineEdit("0.1")
+		self.AlleleFreqTuningParamText = QLineEdit(str(self.alleleFreqTuningParam))
 		self.AlleleFreqTuningParamText.textChanged.connect(self.setAlleleFreqTuningParam)
 		self.AlleleFreqTuningParamText.setMaximumWidth(maxLineWidth)
 		self.AlleleFreqTuningParamText.setAlignment(QtCore.Qt.AlignRight)
@@ -149,17 +149,17 @@ class MainWindow(QMainWindow):
 		
 		#Posterior Distributions of Maternal Inbreeding Histories
 		self.outputOptionTwoCheckBox = QCheckBox()
-		self.outputOptionTwoCheckBox.setChecked(True)
+		self.outputOptionTwoCheckBox.setChecked(self.writeOutput2)
 		self.outputOptionTwoCheckBox.toggled.connect(self.setWrite2)
 		
 		#List of t and F values
 		self.outputOptionThreeCheckBox = QCheckBox()
-		self.outputOptionThreeCheckBox.setChecked(True)
+		self.outputOptionThreeCheckBox.setChecked(self.writeOutput3)
 		self.outputOptionThreeCheckBox.toggled.connect(self.setWrite3)
 		
 		#Posterior Distributions for each maternal genotype at each locus in each family
 		self.outputOptionFourCheckBox = QCheckBox()
-		self.outputOptionFourCheckBox.setChecked(True)
+		self.outputOptionFourCheckBox.setChecked(self.writeOutput4)
 		self.outputOptionFourCheckBox.toggled.connect(self.setWrite4)
 		
 		#Connect run button to spawn a progress dialog when clicked

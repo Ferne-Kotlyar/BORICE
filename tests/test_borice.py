@@ -1,5 +1,6 @@
 from borice.application import *
 
-# Test borice with default parameters
+# Test borice
 def test_borice():
-    Application().run("example_datafile.csv", [True, True, True])
+    app = Application()
+    app.run("example_datafile.csv", num_steps=100, burn_in=1, seed=123)
