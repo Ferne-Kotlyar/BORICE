@@ -76,12 +76,11 @@ class Application(object):
 			if environmentSeed:
 				random.seed(int(environmentSeed))
 
-		input = open(file_name, 'r')
-
-		try:
-			marker_names, families = parse_csv(input, ',')	
-		except CSVFileParseException as x:
-			sys.exit(str(x))
+		with open(file_name, 'r') as input:
+			try:
+				marker_names, families = parse_csv(input, ',')	
+			except CSVFileParseException as x:
+				sys.exit(str(x))
 		
 		assert len(marker_names) == len(locus_model)
 		# main body of code begins here
