@@ -15,6 +15,7 @@ class MainWindow(QMainWindow):
 	allowing for easy user input and data display.
 	"""
 	# Constants
+	INPUT_FIELD_MINIMUM_WIDTH = 150
 	MAX_INT = 999999999
 
 	def __init__(self,parent,app):
@@ -77,31 +78,13 @@ class MainWindow(QMainWindow):
 		# Populate the Menu Bar
 		self.populateMenuBar()
 		
-		# Create pages
-		self.startupPage = self.createStartupTab()
-
 		# Create Tabs
-		self.generalSettings = self.createGeneralSettingsTab()
-		self.fileOutputOptions = self.createFileOutputOptionsTab()
-		self.inputDataSummary = self.createInputDataSummaryTab()
-		self.locusSettings = self.createLocusSettingsTab()
-
-		# Add Tabs
 		self.tabs = QTabWidget()
-		self.startupPageTabIndex = self.tabs.addTab(self.startupPage, "Startup Page")
-		self.generalSettingsTabIndex = self.tabs.addTab(self.generalSettings, "General Settings")
-		self.fileOutputOptionsTabIndex = self.tabs.addTab(self.fileOutputOptions, "File Output Options")
-		self.inputDataSummaryTabIndex = self.tabs.addTab(self.inputDataSummary, "Input Data Summary")
-		self.locusSettingsTabIndex = self.tabs.addTab(self.locusSettings, "Locus Settings")
+		self.startupPage = self.createStartupTab()
+		self.startupPageTabIndex = self.tabs.addTab(self.startupPage, "Get Started")
 
 		# Create Action Box
 		self.actionBox = self.createActionBox()
-
-		# Hide every tabs (except the startup page)
-		self.tabs.setTabVisible(self.generalSettingsTabIndex, False)
-		self.tabs.setTabVisible(self.fileOutputOptionsTabIndex, False)
-		self.tabs.setTabVisible(self.inputDataSummaryTabIndex, False)
-		self.tabs.setTabVisible(self.locusSettingsTabIndex, False)
 
 		# Populate the central layout
 		centralLayout.addWidget(self.tabs)
@@ -116,7 +99,7 @@ class MainWindow(QMainWindow):
 		"""
 		# Open Data File
 		fileOpenAction = QAction("&Open Data File", self)
-		fileOpenAction.setShortcut(QKeySequence.Open)
+		fileOpenAction.setShortcut(QKeySequence.StandardKey.Open)
 		helpText = "Open a data file"
 		fileOpenAction.setToolTip(helpText)
 		fileOpenAction.setStatusTip(helpText)
@@ -124,7 +107,7 @@ class MainWindow(QMainWindow):
 
 		# Quit
 		fileQuitAction = QAction("&Quit", self)
-		fileQuitAction.setShortcut(QKeySequence.Quit)
+		fileQuitAction.setShortcut(QKeySequence.StandardKey.Quit)
 		helpText = "Exit"
 		fileQuitAction.setToolTip(helpText)
 		fileQuitAction.setStatusTip(helpText)
@@ -145,10 +128,12 @@ class MainWindow(QMainWindow):
 		fileMenu.addAction(fileQuitAction)
 		helpMenu.addAction(aboutAction)
 
-	def updateFormStyle(self, formLayout: QFormLayout):
+	def updateFormLayoutStyle(self, formLayout: QFormLayout):
+		"""
+		Update the form layout style to keep a consistent style across the tabs
+		"""
 		formLayout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.FieldsStayAtSizeHint)
 		formLayout.setFormAlignment(Qt.AlignmentFlag.AlignCenter)
-		print()
 
 	def createStartupTab(self):
 		"""
@@ -187,45 +172,51 @@ class MainWindow(QMainWindow):
 		# General Settings Box
 		genSettingsBox = QWidget()
 		genSettingsLayout = QFormLayout(genSettingsBox)
-		self.updateFormStyle(genSettingsLayout)
+		self.updateFormLayoutStyle(genSettingsLayout)
 		genSettingsBox.setLayout(genSettingsLayout)
 
 		# Number of steps
 		self.numStepsText = self.createNumberWidget(QSpinBox, self.numSteps, 0, self.MAX_INT, 1, self.setNumSteps)
+		self.numStepsText.setMinimumWidth(self.INPUT_FIELD_MINIMUM_WIDTH)
 		genSettingsLayout.addRow("Number of Steps:", self.numStepsText)
 
 		# Number of steps to Burn In input
 		self.numStepsBurnInText = self.createNumberWidget(QSpinBox, self.numBurnInSteps, 0, self.MAX_INT, 1, self.setBurnInSteps)
+		self.numStepsBurnInText.setMinimumWidth(self.INPUT_FIELD_MINIMUM_WIDTH)
 		genSettingsLayout.addRow("Number of Burn In Steps:", self.numStepsBurnInText)
 
 		# Initial Population Outcrossing Rate
 		self.initialPopulationOutcrossingRateText = self.createNumberWidget(QDoubleSpinBox, self.outcrossingRate, 0.0, 1.0, 0.05, self.setInitialPopulationOutcrossingRate)
+		self.initialPopulationOutcrossingRateText.setMinimumWidth(self.INPUT_FIELD_MINIMUM_WIDTH)
 		genSettingsLayout.addRow("Initial Population Outcrossing Rate:", self.initialPopulationOutcrossingRateText)
 
 		# Outcrossing Rate Tuning Parameter
 		self.outcrossingRateTuningParamText = self.createNumberWidget(QDoubleSpinBox, self.outcrossingRateTuningParam, 0.0, 1.0, 0.05, self.setOutcrossingRateTuningParam)
+		self.outcrossingRateTuningParamText.setMinimumWidth(self.INPUT_FIELD_MINIMUM_WIDTH)
 		genSettingsLayout.addRow("Outcrossing Rate Tuning Parameter:", self.outcrossingRateTuningParamText)
 
 		# Allele Frequency Tuning Parameter
 		self.AlleleFreqTuningParamText = self.createNumberWidget(QDoubleSpinBox, self.alleleFreqTuningParam, 0.0, 1.0, 0.05, self.setAlleleFreqTuningParam)
+		self.AlleleFreqTuningParamText.setMinimumWidth(self.INPUT_FIELD_MINIMUM_WIDTH)
 		genSettingsLayout.addRow("Allele Frequency Tuning Parameter:", self.AlleleFreqTuningParamText)
 
 		# Ignore Genotyping Errors
 		self.ignoreGenotypingErrorsCheckbox = QCheckBox()
 		self.ignoreGenotypingErrorsCheckbox.setChecked(self.ignoreGenotypingErrors)
 		self.ignoreGenotypingErrorsCheckbox.toggled.connect(self.setIgnoreGenotypingErrors)
+		self.ignoreGenotypingErrorsCheckbox.setMinimumWidth(self.INPUT_FIELD_MINIMUM_WIDTH)
 		genSettingsLayout.addRow("Ignore Genotyping Errors:", self.ignoreGenotypingErrorsCheckbox)
 
 		return genSettingsBox
 
-	def createFileOutputOptionsTab(self):
+	def createFileOutputSettingsTab(self):
 		"""
-		Creates the file output options tab
+		Creates the file output settings tab
 		"""
-		# Create File Output Options
+		# Create File Output Settings
 		outputOptionsBox = QWidget()
 		outputOptionsLayout = QFormLayout(outputOptionsBox)
-		self.updateFormStyle(outputOptionsLayout)
+		self.updateFormLayoutStyle(outputOptionsLayout)
 		outputOptionsBox.setLayout(outputOptionsLayout)
 
 		# Posterior Distributions of Maternal Inbreeding Histories
@@ -248,26 +239,26 @@ class MainWindow(QMainWindow):
 
 		return outputOptionsBox
 
-	def createInputDataSummaryTab(self):
+	def createInputDataSummaryTab(self, markerLociCount, familyCount, individualCount):
 		"""
 		Creates the input data summary tab
 		"""
 		infoBox = QWidget()
 		infoLayout = QFormLayout()
-		self.updateFormStyle(infoLayout)
+		self.updateFormLayoutStyle(infoLayout)
 		infoBox.setLayout(infoLayout)
 
-		self.dataFileNameLabel = QLabel()
-		infoLayout.addRow("Data File:", self.dataFileNameLabel)
+		dataFileNameLabel = QLabel(os.path.basename(self.dataFileName))
+		infoLayout.addRow("Data File:", dataFileNameLabel)
 		
-		self.numLociLabel = QLabel()
-		infoLayout.addRow("Marker Loci:", self.numLociLabel)
+		numLociLabel = QLabel(str(markerLociCount))
+		infoLayout.addRow("Marker Loci:", numLociLabel)
 
-		self.numFamiliesLabel = QLabel()
-		infoLayout.addRow("Families:", self.numFamiliesLabel)
+		numFamiliesLabel = QLabel(str(familyCount))
+		infoLayout.addRow("Families:", numFamiliesLabel)
 
-		self.numIndividualsLabel = QLabel()
-		infoLayout.addRow("Individuals:", self.numIndividualsLabel)
+		numIndividualsLabel = QLabel(str(individualCount))
+		infoLayout.addRow("Individuals:", numIndividualsLabel)
 
 		return infoBox
 
@@ -278,8 +269,21 @@ class MainWindow(QMainWindow):
 		#Locus settings box (Number of settings determined by input data file)
 		locusSettingsBox = QWidget()
 		locusSettingsLayout = QFormLayout(locusSettingsBox)
-		self.updateFormStyle(locusSettingsLayout)
+		self.updateFormLayoutStyle(locusSettingsLayout)
 		locusSettingsBox.setLayout(locusSettingsLayout)
+
+		self.locusCheckBoxList = []
+		for n, _ in enumerate(self.locusModel):
+			locusCheckBox = QCheckBox(str(n), self)
+			palette = locusCheckBox.palette()
+			palette.setColor(QPalette.WindowText, QColor(0,0,0,0))
+			locusCheckBox.setPalette(palette)
+			locusCheckBox.setChecked(False)
+			locusCheckBox.toggled.connect(self.setLocus)
+			self.locusCheckBoxList.append(locusCheckBox)
+
+		for n, locusCheckBox in enumerate(self.locusCheckBoxList):
+			locusSettingsLayout.addRow("Locus %s: " % (n + 1), locusCheckBox)
 
 		return locusSettingsBox
 
@@ -307,28 +311,6 @@ class MainWindow(QMainWindow):
 
 		return actionBox		
 
-	def updateLocusSettings(self):
-		"""
-		Update the locus settings to match the locus model
-		"""
-		locusSettingsLayout = self.locusSettings.layout()
-
-		for i in reversed(range(locusSettingsLayout.count())): 
-			locusSettingsLayout.itemAt(i).widget().setParent(None)
-
-		self.locusCheckBoxList = []
-		for n, _ in enumerate(self.locusModel):
-			locusCheckBox = QCheckBox(str(n), self)
-			palette = locusCheckBox.palette()
-			palette.setColor(QPalette.WindowText, QColor(0,0,0,0))
-			locusCheckBox.setPalette(palette)
-			locusCheckBox.setChecked(False)
-			locusCheckBox.toggled.connect(self.setLocus)
-			self.locusCheckBoxList.append(locusCheckBox)
-
-		for n, locusCheckBox in enumerate(self.locusCheckBoxList):
-			locusSettingsLayout.addRow("Locus %s: " % (n + 1), locusCheckBox)
-	
 	def setBurnInSteps(self, value):
 		self.numBurnInSteps = int(str(value))
 
@@ -364,7 +346,7 @@ class MainWindow(QMainWindow):
 	def openFile(self):
 		self.dataFileName, _ = QFileDialog.getOpenFileName(self, "Open Data File", ".", "Data Files (*.csv)")
 
-		#Populate data entry tables for Allele Frequency Selection and Inbreeding History Selection
+		# Populate data entry tables for Allele Frequency Selection and Inbreeding History Selection
 		if (self.dataFileName):
 			dataFile = open(self.dataFileName, "r")
 
@@ -381,27 +363,28 @@ class MainWindow(QMainWindow):
 
 			numIndividuals -= 2
 			
-			# the default model for each locus is False, meaning null alleles are not considered at that locus
+			# The default model for each locus is False, meaning null alleles are not considered at that locus
 			self.locus_list = marker_names
 			locusModelList = []
 			for _ in self.locus_list:
 				null_locus = False
 				locusModelList.append(null_locus)
 			self.locusModel = locusModelList
-			
-			self.dataFileNameLabel.setText(os.path.basename(self.dataFileName))
-			self.numLociLabel.setText(str(len(marker_names)))
-			self.numFamiliesLabel.setText(str(len(families)))
-			self.numIndividualsLabel.setText(str(numIndividuals))
 
-			self.updateLocusSettings()
-			
-			# Hide every tabs (except the startup page)
-			self.tabs.setTabVisible(self.startupPageTabIndex, False)
-			self.tabs.setTabVisible(self.generalSettingsTabIndex, True)
-			self.tabs.setTabVisible(self.fileOutputOptionsTabIndex, True)
-			self.tabs.setTabVisible(self.inputDataSummaryTabIndex, True)
-			self.tabs.setTabVisible(self.locusSettingsTabIndex, True)
+			self.tabs.clear()
+
+			# Create Tabs
+			self.generalSettings = self.createGeneralSettingsTab()
+			self.fileOutputSettings = self.createFileOutputSettingsTab()
+			self.locusSettings = self.createLocusSettingsTab()
+			self.inputDataSummary = self.createInputDataSummaryTab(len(marker_names), len(families), numIndividuals)
+
+			# Add Tabs
+			self.generalSettingsTabIndex = self.tabs.addTab(self.generalSettings, "General Settings")
+			self.fileOutputSettingsTabIndex = self.tabs.addTab(self.fileOutputSettings, "File Output Settings")
+			self.locusSettingsTabIndex = self.tabs.addTab(self.locusSettings, "Locus Settings")
+			self.inputDataSummaryTabIndex = self.tabs.addTab(self.inputDataSummary, "Input Data Summary")
+
 			self.actionBox.setDisabled(False)
 		else:
 			pass
@@ -424,7 +407,6 @@ class MainWindow(QMainWindow):
 		progress.show()
 
 		thread = BoriceThread(self, self.dataFileName, self.locusModel, self.numSteps, self.numBurnInSteps, self.outcrossingRateTuningParam, self.alleleFreqTuningParam, self.outcrossingRate, self.writeOutput2, self.writeOutput3, self.writeOutput4, self.ignoreGenotypingErrors)
-		thread.setPriority(QThread.TimeCriticalPriority)
 		
 		thread.start()
 
