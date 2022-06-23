@@ -15,7 +15,6 @@ class MainWindow(QMainWindow):
 	allowing for easy user input and data display.
 	"""
 	# Constants
-	MAX_LINE_WIDTH = 250
 	MAX_INT = 999999999
 
 	def __init__(self,parent,app):
@@ -146,6 +145,11 @@ class MainWindow(QMainWindow):
 		fileMenu.addAction(fileQuitAction)
 		helpMenu.addAction(aboutAction)
 
+	def updateFormStyle(self, formLayout: QFormLayout):
+		formLayout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.FieldsStayAtSizeHint)
+		formLayout.setFormAlignment(Qt.AlignmentFlag.AlignCenter)
+		print()
+
 	def createStartupTab(self):
 		"""
 		Create the startup box
@@ -183,40 +187,34 @@ class MainWindow(QMainWindow):
 		# General Settings Box
 		genSettingsBox = QWidget()
 		genSettingsLayout = QFormLayout(genSettingsBox)
-		genSettingsLayout.setFormAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.updateFormStyle(genSettingsLayout)
 		genSettingsBox.setLayout(genSettingsLayout)
 
 		# Number of steps
 		self.numStepsText = self.createNumberWidget(QSpinBox, self.numSteps, 0, self.MAX_INT, 1, self.setNumSteps)
-		self.numStepsText.setMaximumWidth(self.MAX_LINE_WIDTH)
-		genSettingsLayout.addRow("Number of Steps", self.numStepsText)
+		genSettingsLayout.addRow("Number of Steps:", self.numStepsText)
 
 		# Number of steps to Burn In input
 		self.numStepsBurnInText = self.createNumberWidget(QSpinBox, self.numBurnInSteps, 0, self.MAX_INT, 1, self.setBurnInSteps)
-		self.numStepsBurnInText.setMaximumWidth(self.MAX_LINE_WIDTH)
-		genSettingsLayout.addRow("Number of Burn In Steps", self.numStepsBurnInText)
-
-		# Outcrossing Rate Tuning Parameter
-		self.outcrossingRateTuningParamText = self.createNumberWidget(QDoubleSpinBox, self.outcrossingRateTuningParam, 0.0, 1.0, 0.05, self.setOutcrossingRateTuningParam)
-		self.outcrossingRateTuningParamText.setMaximumWidth(self.MAX_LINE_WIDTH)
-		genSettingsLayout.addRow("Outcrossing Rate Tuning Parameter", self.outcrossingRateTuningParamText)
+		genSettingsLayout.addRow("Number of Burn In Steps:", self.numStepsBurnInText)
 
 		# Initial Population Outcrossing Rate
 		self.initialPopulationOutcrossingRateText = self.createNumberWidget(QDoubleSpinBox, self.outcrossingRate, 0.0, 1.0, 0.05, self.setInitialPopulationOutcrossingRate)
-		self.initialPopulationOutcrossingRateText.setMaximumWidth(self.MAX_LINE_WIDTH)
-		genSettingsLayout.addRow("Initial Population Outcrossing Rate", self.initialPopulationOutcrossingRateText)
+		genSettingsLayout.addRow("Initial Population Outcrossing Rate:", self.initialPopulationOutcrossingRateText)
+
+		# Outcrossing Rate Tuning Parameter
+		self.outcrossingRateTuningParamText = self.createNumberWidget(QDoubleSpinBox, self.outcrossingRateTuningParam, 0.0, 1.0, 0.05, self.setOutcrossingRateTuningParam)
+		genSettingsLayout.addRow("Outcrossing Rate Tuning Parameter:", self.outcrossingRateTuningParamText)
 
 		# Allele Frequency Tuning Parameter
 		self.AlleleFreqTuningParamText = self.createNumberWidget(QDoubleSpinBox, self.alleleFreqTuningParam, 0.0, 1.0, 0.05, self.setAlleleFreqTuningParam)
-		self.AlleleFreqTuningParamText.setMaximumWidth(self.MAX_LINE_WIDTH)
-		genSettingsLayout.addRow("Allele Frequency Tuning Parameter", self.AlleleFreqTuningParamText)
+		genSettingsLayout.addRow("Allele Frequency Tuning Parameter:", self.AlleleFreqTuningParamText)
 
 		# Ignore Genotyping Errors
 		self.ignoreGenotypingErrorsCheckbox = QCheckBox()
 		self.ignoreGenotypingErrorsCheckbox.setChecked(self.ignoreGenotypingErrors)
 		self.ignoreGenotypingErrorsCheckbox.toggled.connect(self.setIgnoreGenotypingErrors)
-		self.ignoreGenotypingErrorsCheckbox.setMaximumWidth(self.MAX_LINE_WIDTH)
-		genSettingsLayout.addRow("Ignore Genotyping Errors", self.ignoreGenotypingErrorsCheckbox)
+		genSettingsLayout.addRow("Ignore Genotyping Errors:", self.ignoreGenotypingErrorsCheckbox)
 
 		return genSettingsBox
 
@@ -227,27 +225,26 @@ class MainWindow(QMainWindow):
 		# Create File Output Options
 		outputOptionsBox = QWidget()
 		outputOptionsLayout = QFormLayout(outputOptionsBox)
-		outputOptionsLayout.setFormAlignment(Qt.AlignmentFlag.AlignCenter)
-		outputOptionsLayout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.FieldsStayAtSizeHint)
+		self.updateFormStyle(outputOptionsLayout)
 		outputOptionsBox.setLayout(outputOptionsLayout)
 
 		# Posterior Distributions of Maternal Inbreeding Histories
 		self.writeOutput2Checkbox = QCheckBox()
 		self.writeOutput2Checkbox.setChecked(self.writeOutput2)
 		self.writeOutput2Checkbox.toggled.connect(self.setWrite2)
-		outputOptionsLayout.addRow("Posterior Distributions of Maternal Inbreeding Histories", self.writeOutput2Checkbox)
+		outputOptionsLayout.addRow("Posterior distributions of maternal inbreeding histories:", self.writeOutput2Checkbox)
 		
 		# List of t and F values
 		self.writeOutput3Checkbox = QCheckBox()
 		self.writeOutput3Checkbox.setChecked(self.writeOutput3)
 		self.writeOutput3Checkbox.toggled.connect(self.setWrite3)
-		outputOptionsLayout.addRow("List of t and F values", self.writeOutput3Checkbox)
+		outputOptionsLayout.addRow("List of t and F values:", self.writeOutput3Checkbox)
 		
 		# Posterior Distributions for each maternal genotype at each locus in each family
 		self.writeOutput4Checkbox = QCheckBox()
 		self.writeOutput4Checkbox.setChecked(self.writeOutput4)
 		self.writeOutput4Checkbox.toggled.connect(self.setWrite4)
-		outputOptionsLayout.addRow("Posterior Distributions for each maternal genotype at each locus in each family", self.writeOutput4Checkbox)
+		outputOptionsLayout.addRow("Posterior distributions for each maternal genotype at each locus in each family:", self.writeOutput4Checkbox)
 
 		return outputOptionsBox
 
@@ -257,20 +254,20 @@ class MainWindow(QMainWindow):
 		"""
 		infoBox = QWidget()
 		infoLayout = QFormLayout()
-		infoLayout.setFormAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.updateFormStyle(infoLayout)
 		infoBox.setLayout(infoLayout)
+
+		self.dataFileNameLabel = QLabel()
+		infoLayout.addRow("Data File:", self.dataFileNameLabel)
 		
 		self.numLociLabel = QLabel()
-		self.numLociLabel.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-		infoLayout.addRow("Number of Marker Loci", self.numLociLabel)
+		infoLayout.addRow("Marker Loci:", self.numLociLabel)
 
 		self.numFamiliesLabel = QLabel()
-		self.numFamiliesLabel.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-		infoLayout.addRow("Number of Families", self.numFamiliesLabel)
+		infoLayout.addRow("Families:", self.numFamiliesLabel)
 
 		self.numIndividualsLabel = QLabel()
-		self.numIndividualsLabel.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-		infoLayout.addRow("Number of Individuals", self.numIndividualsLabel)
+		infoLayout.addRow("Individuals:", self.numIndividualsLabel)
 
 		return infoBox
 
@@ -281,8 +278,7 @@ class MainWindow(QMainWindow):
 		#Locus settings box (Number of settings determined by input data file)
 		locusSettingsBox = QWidget()
 		locusSettingsLayout = QFormLayout(locusSettingsBox)
-		locusSettingsLayout.setFormAlignment(Qt.AlignmentFlag.AlignCenter)
-		locusSettingsLayout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.FieldsStayAtSizeHint)
+		self.updateFormStyle(locusSettingsLayout)
 		locusSettingsBox.setLayout(locusSettingsLayout)
 
 		return locusSettingsBox
@@ -393,6 +389,7 @@ class MainWindow(QMainWindow):
 				locusModelList.append(null_locus)
 			self.locusModel = locusModelList
 			
+			self.dataFileNameLabel.setText(os.path.basename(self.dataFileName))
 			self.numLociLabel.setText(str(len(marker_names)))
 			self.numFamiliesLabel.setText(str(len(families)))
 			self.numIndividualsLabel.setText(str(numIndividuals))
