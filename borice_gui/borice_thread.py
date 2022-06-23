@@ -22,5 +22,5 @@ class BoriceThread(QtCore.QThread):
 		self.app.run(self.dataFileName, self.locusModel, self.numSteps, self.numBurnInSteps, self.outcrossingRateTuningParam, self.alleleFreqTuningParam, self.outcrossingRate, self.writeOutput2, self.writeOutput3, self.writeOutput4, self.ignoreGenotypingErrors)
 
 	def getStep(self):
-		return self.app.getStep()
+		return self.app.current_step
         

@@ -11,7 +11,7 @@ def read(fname):
 
 setup(
     name = "BORICE",
-    version = "1.1.1",
+    version = "2.0",
     author = "Vanessa Koelling, Patrick Monnahan, John Kelly (modified by Ferne Kotlyar and Adrien Givry)",
     description = "BORICE is a free software to estimate the mean outcrossing rate and inbreeding coefficient of populations using Bayesian methods.",
     license = "GNU",

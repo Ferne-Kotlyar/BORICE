@@ -65,6 +65,8 @@ class Application(object):
 		print('- Seed: ' + str(seed))
 		print('')
 
+		self.current_step = 0
+
 		# If a custom seed has been provided, initialize the random number generator with this seed.
 		if seed:
 			random.seed(seed)
@@ -183,7 +185,6 @@ class Application(object):
 		for step in range(num_steps):
 			if step != 0:
 				self.current_step = step - 1
-						#print self.current_step
 			
 			prev_t = population.outcrossing_rate
 			prev_lnL = population.calc_pop_lnL(locus_model)

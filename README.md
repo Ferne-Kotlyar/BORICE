@@ -74,7 +74,7 @@ As opposed to the CLI version, the GUI version of BORICE doesn't take any comman
 ```properties
 python borice_gui
 ```
-Once BORICE GUI is open, you should see a blank screen. In the menu bar, click on "File", then "Open Data File"; select your input data file. A setting panel should appear where you can choose to edit BORICE's default parameters.
+Once BORICE GUI is open, you should the startup page. From there, you can select a data file from your computer. A setting panel should appear where you can choose to edit BORICE's default parameters.
 
 Click "Run" to start processing your data. You will get an alert message when the run is complete.
 
