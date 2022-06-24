@@ -1,0 +1,10 @@
+- file_name: example_datafile.csv
+  burn_in: 1
+  num_steps: 100
+  seed: 123
+  hash: 74935966826d80d98d25424fa232aa3e580f2910
+- file_name: example_datafile.csv
+  burn_in: 1
+  num_steps: 100
+  seed: 2
+  hash: 319dac792fe4d5e78ff62ae6bcf33a08408bf35e
