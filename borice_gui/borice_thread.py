@@ -4,7 +4,7 @@ from borice.application import Application
 
 class BoriceThread(QtCore.QThread):
 	def __init__(self, parent, dataFileName, locusModel, numSteps, numBurnInSteps, outcrossingRateTuningParam, alleleFreqTuningParam, outcrossingRate, writeOutput2, writeOutput3, writeOutput4, ignoreGenotypingErrors):
-		super(BoriceThread, self).__init__(parent)
+		super().__init__(parent)
 		self.dataFileName = dataFileName
 		self.locusModel = locusModel
 		self.numSteps = numSteps

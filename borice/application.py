@@ -65,6 +65,8 @@ class Application(object):
 		print('- Seed: ' + str(seed))
 		print('')
 
+		self.current_step = 0
+
 		# If a custom seed has been provided, initialize the random number generator with this seed.
 		if seed:
 			random.seed(seed)
@@ -74,12 +76,11 @@ class Application(object):
 			if environmentSeed:
 				random.seed(int(environmentSeed))
 
-		input = open(file_name, 'r')
-
-		try:
-			marker_names, families = parse_csv(input, ',')	
-		except CSVFileParseException as x:
-			sys.exit(str(x))
+		with open(file_name, 'r') as input:
+			try:
+				marker_names, families = parse_csv(input, ',')	
+			except CSVFileParseException as x:
+				sys.exit(str(x))
 		
 		assert len(marker_names) == len(locus_model)
 		# main body of code begins here
@@ -183,7 +184,6 @@ class Application(object):
 		for step in range(num_steps):
 			if step != 0:
 				self.current_step = step - 1
-						#print self.current_step
 			
 			prev_t = population.outcrossing_rate
 			prev_lnL = population.calc_pop_lnL(locus_model)

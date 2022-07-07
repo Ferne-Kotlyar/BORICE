@@ -164,6 +164,7 @@ cython_debug/
 
 # Visual Studio
 .vs/
+.vscode/
 
 # BORICE specifics
 BORICE_output*
